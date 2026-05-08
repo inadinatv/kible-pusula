@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kıble & Pusula - İnadına TV</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background-color: #0f172a; color: #f8fafc; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; }
+        
+        /* Başlık */
+        .header { text-align: center; width: 100%; padding: 20px; background: linear-gradient(135deg, #1e293b, #0f172a); border-bottom: 1px solid #334155; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 10; }
+        .baslik { font-size: 22px; font-weight: 800; color: #10b981; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .alt-baslik { font-size: 13px; color: #94a3b8; font-weight: 500; }
+        
+        /* Bilgi Paneli */
+        .bilgi-paneli { background: #1e293b; padding: 15px 20px; border-radius: 16px; margin: 20px 0; text-align: center; border: 1px solid #334155; box-shadow: 0 4px 6px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
+        .konum-yazi { font-size: 15px; font-weight: 600; color: #f8fafc; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .kible-yazi { font-size: 13px; color: #10b981; font-weight: 600; background: rgba(16, 185, 129, 0.1); padding: 5px 10px; border-radius: 8px; display: inline-block; }
+        
+        /* Pusula Alanı */
+        .pusula-container { position: relative; width: 300px; height: 300px; margin: 20px auto; }
+        .pusula-cemberi { width: 100%; height: 100%; border-radius: 50%; border: 4px solid #334155; background: radial-gradient(circle, #1e293b 0%, #0f172a 100%); position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.4); transition: transform 0.1s ease-out; }
+        
+        /* Yön İşaretleri (Kuzey, Güney, Doğu, Batı) */
+        .yon { position: absolute; font-weight: 800; font-size: 20px; color: #94a3b8; }
+        .yon.n { top: 10px; left: 50%; transform: translateX(-50%); color: #ef4444; } /* Kuzey kırmızı */
+        .yon.s { bottom: 10px; left: 50%; transform: translateX(-50%); }
+        .yon.e { top: 50%; right: 15px; transform: translateY(-50%); }
+        .yon.w { top: 50%; left: 15px; transform: translateY(-50%); }
+        
+        /* Merkez Noktası */
+        .merkez { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 16px; height: 16px; background: #f8fafc; border-radius: 50%; z-index: 5; box-shadow: 0 0 10px rgba(0,0,0,0.5); border: 3px solid #334155; }
+        
+        /* Kıble Oku (Kabe İkonlu) */
+        .kible-oku-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 3; transition: transform 0.3s ease-out; }
+        .kible-cizgi { position: absolute; bottom: 50%; left: 50%; width: 4px; height: 40%; background: linear-gradient(to top, transparent, #10b981); transform: translateX(-50%); border-radius: 4px 4px 0 0; }
+        .kabe-ikon { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-size: 28px; filter: drop-shadow(0 0 5px rgba(16,185,129,0.8)); }
+        
+        /* Sabit Referans Oku (Telefonun baktığı yön) */
+        .sabit-ok { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); color: #0ea5e9; font-size: 30px; z-index: 10; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        
+        /* Başlat Butonu Ekranı */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); z-index: 100; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center; }
+        .baslat-btn { background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 15px 40px; font-size: 18px; font-weight: 700; border-radius: 30px; cursor: pointer; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); transition: transform 0.2s; font-family: 'Poppins', sans-serif; margin-top: 20px; }
+        .baslat-btn:active { transform: scale(0.95); }
+        .uyari-metni { color: #cbd5e1; font-size: 14px; margin-top: 15px; max-width: 300px; line-height: 1.6; }
+        
+        .footer { margin-top: auto; padding: 20px; text-align: center; font-size: 12px; color: #64748b; }
+        .marka { color: #10b981; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="overlay" id="overlay">
+        <i class="fas fa-kaaba" style="font-size: 60px; color: #10b981; margin-bottom: 20px;"></i>
+        <h2 style="color: white; margin-bottom: 10px;">Pusulayı Kalibre Et</h2>
+        <p class="uyari-metni">Kıbleyi doğru bulabilmemiz için konum ve telefon sensörü izinlerine ihtiyacımız var. Lütfen telefonunuzun GPS'ini açıp butona tıklayın.</p>
+        <button class="baslat-btn" onclick="pusulayiBaslat()"><i class="fas fa-compass"></i> Pusulayı Başlat</button>
+    </div>
+
+    <div class="header">
+        <div class="baslik">🕋 KIBLE & PUSULA</div>
+        <div class="alt-baslik">Canlı Sensör Verisi</div>
+    </div>
+
+    <div class="bilgi-paneli">
+        <div class="konum-yazi" id="konumYazi"><i class="fas fa-map-marker-alt" style="color: #ef4444;"></i> Konum Aranıyor...</div>
+        <div class="kible-yazi" id="kibleAcisiYazi">Kıble Açısı: Hesaplanıyor...</div>
+    </div>
+
+    <div class="pusula-container">
+        <i class="fas fa-caret-down sabit-ok"></i>
+        
+        <div class="pusula-cemberi" id="pusulaCemberi">
+            <div class="merkez"></div>
+            <div class="yon n">N</div>
+            <div class="yon s">S</div>
+            <div class="yon e">E</div>
+            <div class="yon w">W</div>
+            
+            <div class="kible-oku-container" id="kibleOku">
+                <div class="kible-cizgi"></div>
+                <div class="kabe-ikon">🕋</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        © 2026 <span class="marka">İnadına TV</span> Özel Servisi<br>
+        Uzak durulması gereken manyetik alanlardan uzakta kullanın.
+    </div>
+
+    <script>
+        let kibleAcisi = 0;
+        let pusulaCemberi = document.getElementById('pusulaCemberi');
+        let kibleOku = document.getElementById('kibleOku');
+        let konumYazi = document.getElementById('konumYazi');
+        let kibleAcisiYazi = document.getElementById('kibleAcisiYazi');
+
+        // Kabe'nin Koordinatları
+        const kabeEnlem = 21.422487;
+        const kabeBoylam = 39.826206;
+
+        // Dereceyi Radyana çevirme fonksiyonu
+        function radyanaCevir(derece) {
+            return derece * (Math.PI / 180);
+        }
+
+        // Radyanı Dereceye çevirme fonksiyonu
+        function dereceyeCevir(radyan) {
+            return radyan * (180 / Math.PI);
+        }
+
+        // Bulunulan konuma göre Kıble açısını hesaplayan matematiksel formül
+        function kibleHesapla(kullaniciEnlem, kullaniciBoylam) {
+            let phiK = radyanaCevir(kabeEnlem);
+            let lambdaK = radyanaCevir(kabeBoylam);
+            let phi = radyanaCevir(kullaniciEnlem);
+            let lambda = radyanaCevir(kullaniciBoylam);
+            
+            let y = Math.sin(lambdaK - lambda);
+            let x = Math.cos(phi) * Math.tan(phiK) - Math.sin(phi) * Math.cos(lambdaK - lambda);
+            
+            let qibla = dereceyeCevir(Math.atan2(y, x));
+            return (qibla + 360) % 360; // 0-360 arası normalize et
+        }
+
+        // Konum adını ücretsiz bir API'den çekme
+        function sehirAdiniBul(lat, lon) {
+            fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=tr`)
+                .then(response => response.json())
+                .then(data => {
+                    let sehir = data.city || data.locality || "Bilinmeyen Konum";
+                    konumYazi.innerHTML = `<i class="fas fa-map-marker-alt" style="color: #ef4444;"></i> ${sehir}`;
+                })
+                .catch(() => {
+                    konumYazi.innerHTML = `<i class="fas fa-map-marker-alt" style="color: #ef4444;"></i> GPS Konumu Alındı`;
+                });
+        }
+
+        function pusulayiBaslat() {
+            // iOS 13+ için sensör izni isteme
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            konumVeSensoruAktifEt();
+                        } else {
+                            alert('Pusulanın çalışması için sensör izni gereklidir.');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // Android ve eski iOS cihazlar
+                konumVeSensoruAktifEt();
+            }
+        }
+
+        function konumVeSensoruAktifEt() {
+            document.getElementById('overlay').style.display = 'none';
+
+            // GPS Konumunu Al
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    let lat = position.coords.latitude;
+                    let lon = position.coords.longitude;
+                    
+                    sehirAdiniBul(lat, lon);
+                    
+                    kibleAcisi = kibleHesapla(lat, lon);
+                    kibleAcisiYazi.innerHTML = `Kıble Açısı: ${kibleAcisi.toFixed(1)}°`;
+                    
+                    // Kabe ikonunu pusula içindeki doğru dereceye sabitle
+                    kibleOku.style.transform = `rotate(${kibleAcisi}deg)`;
+                    
+                }, (error) => {
+                    alert('Konum alınamadı. Lütfen telefonunuzun konum servisini açtığınızdan emin olun.');
+                    konumYazi.innerHTML = `<i class="fas fa-exclamation-triangle" style="color: #fbbf24;"></i> Konum Bulunamadı`;
+                }, { enableHighAccuracy: true });
+            } else {
+                alert('Tarayıcınız konum özelliğini desteklemiyor.');
+            }
+
+            // Jiroskop/Pusula verisini dinle
+            window.addEventListener("deviceorientationabsolute", yonlendiriciIsle);
+            window.addEventListener("deviceorientation", yonlendiriciIsle);
+        }
+
+        function yonlendiriciIsle(event) {
+            let baslik = 0;
+            // iOS için (webkitCompassHeading)
+            if (event.webkitCompassHeading) {
+                baslik = event.webkitCompassHeading;
+            } 
+            // Android için (absolute alpha)
+            else if (event.alpha !== null) {
+                baslik = 360 - event.alpha;
+            }
+            
+            // Pusula çemberini telefonun baktığı yönün tersine çevirerek Kuzeyi hep yukarda tutuyoruz
+            pusulaCemberi.style.transform = `rotate(${-baslik}deg)`;
+        }
+    </script>
+</body>
+</html>
